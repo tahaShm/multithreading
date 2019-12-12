@@ -15,4 +15,3 @@ monitor : monitor.cpp
 
 clean:
 	rm *.o
-	rm EnsembleClassifier.out				
