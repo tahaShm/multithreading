@@ -3,7 +3,16 @@
 
 using namespace std;
 
-Edge findEdge(string s, string d, vector <Edge> allEdges){
+vector <Monitor> monitors;
+
+vector <Edge> allEdges;
+vector <Path> allpaths;
+vector <Car> allCars;
+int globalPathId = 0;
+int globalCarId = 0;
+
+
+Edge findEdge(string s, string d){
 	Edge wantedEdge;
 	int edgesSize = allEdges.size();
 	for (int i = 0; i < edgesSize; i++){
@@ -14,7 +23,18 @@ Edge findEdge(string s, string d, vector <Edge> allEdges){
 	}
 	return wantedEdge;
 }
-void getInputs(vector <Edge> &allEdges, vector <Path> &allpaths, vector <Car> &allCars, int &globalPathId, int &globalCarId) {
+int findEdgeIndex(string s, string d){
+	int index = -1;
+	int edgesSize = allEdges.size();
+	for (int i = 0; i < edgesSize; i++){
+		if (allEdges[i].source == s && allEdges[i].destination == d){
+			index = i;
+			break;
+		}
+	}
+	return index;
+}
+void getInputs() {
 	fstream fin; 
     fin.open("./input.txt", ios::in);
     vector<string> row; 
@@ -57,7 +77,7 @@ void getInputs(vector <Edge> &allEdges, vector <Path> &allpaths, vector <Car> &a
 					if (index >= 1) {
 						string token1 = allNodes[allNodes.size()-1];
 						string token2 = token;
-						Edge currentEdge = findEdge(token1, token2, allEdges);
+						Edge currentEdge = findEdge(token1, token2);
 						pathEdges.push_back(currentEdge);
 					}
 					allNodes.push_back(token);
@@ -84,7 +104,7 @@ void getInputs(vector <Edge> &allEdges, vector <Path> &allpaths, vector <Car> &a
     fin.close();
 }
 
-void printStuff(vector <Edge> &allEdges, vector <Path> &allpaths, vector <Car> &allCars){
+void printStuff(){
 	int EdgesSize = allEdges.size();
 	int PathsSize = allpaths.size();
 	int carsSize = allCars.size();
@@ -105,12 +125,51 @@ void printStuff(vector <Edge> &allEdges, vector <Path> &allpaths, vector <Car> &
 		allCars[i].printInfo();
 	}
 }
+void threadFunction(int index, int p){
+	string s = allCars[index].getSource();
+	string d = allCars[index].getDestination();
+	// if (allCars[id].)
+	while(true){
+		s = allCars[index].getSource();
+		d = allCars[index].getDestination();
+		int id = findEdgeIndex(s, d);
+		cout << s << " *** " << d << endl;
+		if (id != -1){
+			monitors[id].crossCars(p);
+		}
+		else{
+			cout << "end of car!" << endl;
+			break;
+		}
+		int go = allCars[index].goAhead();
+		// if (go == -1) {
+		// 	cout << "end of car!" << endl;
+		// 	break;
+		// }
+
+		// cout << "path length : " << allCars[index].getPathlength() << "car id : " << index << "  , position : " << allCars[index].getPosition() << endl;
+	}
+}
+
+void makeMonitorsAndThreadsAndDoProcess(){
+	int carsSize = allCars.size();
+	int edgesSize = allEdges.size();
+	for (int i = 0; i < edgesSize; i++) {
+		Monitor newMonitor(allEdges[i].h); //index of "allEdges" and "monitors" are the same.
+		monitors.push_back(newMonitor);
+	}
+	// thread t (&threadFunction, 1);
+	// t.join();
+	thread allThreads[100];
+	for (int i = 0; i < carsSize; i++) {
+		allThreads[i] = thread (&threadFunction, i, allCars[i].getP());
+	}
+	for (int i = 0; i < carsSize; i++)
+		allThreads[i].join();
+
+}
 int main() {
-	vector <Edge> allEdges;
-	vector <Path> allpaths;
-	vector <Car> allCars;
-	int globalPathId = 0;
-	int globalCarId = 0;
-	getInputs(allEdges, allpaths, allCars, globalPathId, globalCarId);
-	printStuff(allEdges, allpaths, allCars);
+	getInputs();
+	// printStuff(allEdges, allpaths, allCars);
+	makeMonitorsAndThreadsAndDoProcess();
 }

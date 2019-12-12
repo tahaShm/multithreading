@@ -13,6 +13,11 @@
 #include <sstream>
 #include <cmath>
 #include <time.h>
+#include <semaphore.h>
+#include <bits/stdc++.h>
+#include <thread>
 
+#define RANGE 10000000
+#define BIGNUM 1000000
 
 #endif

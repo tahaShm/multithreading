@@ -31,6 +31,13 @@ private :
 public :
     Car(Path path, int id);
     void printInfo();
+    int getP();
+    string getSource();
+    string getDestination();
+    int goAhead();
+    void addPollution(double newPollution);
+    int getPosition();
+    int getPathlength();
 };
 
 #endif

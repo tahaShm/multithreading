@@ -18,3 +18,35 @@ void Car::printInfo(){
     cout << "   curPollution : " << curPollution << endl;
     cout << "   enterTime : " << enterTimes[0].count() << endl;
 }
+int Car::getP(){
+    return p;
+}
+string Car::getSource(){
+    if (position >= carPath.edges.size())
+        return "-";
+    else
+        return carPath.edges[position].source;
+}
+string Car::getDestination(){
+    if (position >= carPath.edges.size())
+        return "-";
+    else
+        return carPath.edges[position].destination;
+}
+int Car::goAhead(){
+    position++;
+    milliseconds newTime = duration_cast < milliseconds > (
+        system_clock::now().time_since_epoch()
+    );
+    enterTimes.push_back(newTime);
+    finishTimes.push_back(newTime);
+    if (position >= carPath.edges.size())
+        return -1;
+    return 1;
+}
+int Car::getPosition(){
+    return position;
+}
+int Car::getPathlength(){
+    return carPath.edges.size();
+}
