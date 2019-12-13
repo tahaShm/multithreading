@@ -26,6 +26,7 @@ private :
     int position;
     double curEmission;
     vector <double> emissions;
+    vector <double> totalEmissions;
     vector <milliseconds> enterTimes;
     vector <milliseconds> finishTimes;
     int pathId;
@@ -42,11 +43,15 @@ public :
     int getPathlength();
     void addEnterTime(milliseconds enterTime);
     void addFinishTime(milliseconds finishTime);
-    void setNewEmission(double newEmission);
+    void setNewEmission(double newEmission, double newTotalEmission);
     double getCurrentEmission();
     void printEmissions();
     void printTimes();
     int getPathId();
+    vector <double> getEmissions();
+    vector <double> getTotalEmissions();
+    vector <milliseconds> getEnterTimes();
+    vector <milliseconds> getFinishTimes();
 };
 
 #endif

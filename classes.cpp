@@ -49,8 +49,9 @@ void Car::addEnterTime(milliseconds enterTime){
 void Car::addFinishTime(milliseconds finishTime){
     finishTimes.push_back(finishTime);
 }
-void Car::setNewEmission(double newEmission){
+void Car::setNewEmission(double newEmission, double newTotalEmission){
     emissions.push_back(newEmission);
+    totalEmissions.push_back(newTotalEmission + newEmission);
     curEmission += newEmission;
 }
 double Car::getCurrentEmission(){
@@ -69,4 +70,16 @@ void Car::printTimes(){
 }
 int Car::getPathId(){
     return pathId;
+}
+vector <double> Car::getEmissions(){
+    return emissions;
+}
+vector <double> Car::getTotalEmissions(){
+    return totalEmissions;
+}
+vector <milliseconds> Car::getEnterTimes(){
+    return enterTimes;
+}
+vector <milliseconds> Car::getFinishTimes(){
+    return finishTimes;
 }

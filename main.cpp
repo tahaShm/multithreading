@@ -10,7 +10,6 @@ vector <Path> allpaths;
 vector <Car> allCars;
 int globalPathId = 0;
 int globalCarId = 0;
-double totalEmission = 0.0;
 
 Edge findEdge(string s, string d){
 	Edge wantedEdge;
@@ -125,13 +124,32 @@ void printStuff(){
 		allCars[i].printInfo();
 	}
 }
-string contentOfCarMoves(int index) {
-	return "hello" + to_string(index);
+double calculateTotalEmission(){
+	int carsSize = allCars.size();
+	double total = 0.0;
+	for (int i = 0; i< carsSize; i++)
+		total += allCars[i].getCurrentEmission();
+	return total;
+
+}
+string contentOfCarMoves(int index, int pathId) {
+	string content = "";
+	string seperator = ", ";
+	int iterSize = allCars[index].getPathlength();
+	vector <double> emissions = allCars[index].getEmissions();
+	vector <double> totalEmissions = allCars[index].getTotalEmissions();
+	vector <milliseconds> enterTimes = allCars[index].getEnterTimes();
+	vector <milliseconds> finishTimes = allCars[index].getFinishTimes();
+	double totalEmission = calculateTotalEmission();
+	for (int i = 0; i < iterSize; i++){
+		content += allpaths[pathId].edges[i].source + seperator + to_string(enterTimes[i].count()) + seperator + allpaths[pathId].edges[i].destination + seperator + to_string(finishTimes[i].count()) + seperator + to_string(emissions[i]) + seperator + to_string(totalEmissions[i]) + "\n";
+	}
+	return content;
 }
 void makeCorrespondingFile(int index){
 	int pathId = allCars[index].getPathId();
 	string route = to_string(pathId) + "-" + to_string(index);
-	string content = contentOfCarMoves(index);
+	string content = contentOfCarMoves(index, pathId);
 	int fd = open(route.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
 	close(fd);
 	fd = open(route.c_str(), O_WRONLY);
@@ -151,7 +169,8 @@ void threadFunction(int index, int p){
 
 			double newEmission = monitors[id].crossCars(p);
 
-			allCars[index].setNewEmission(newEmission);
+			double totalEmission = calculateTotalEmission();
+			allCars[index].setNewEmission(newEmission, totalEmission);
 
 			milliseconds finishTime = duration_cast < milliseconds > (
 				system_clock::now().time_since_epoch()
@@ -163,7 +182,6 @@ void threadFunction(int index, int p){
 		// cout << " " << endl;
 		// cout << "car index : " << index << "  source : " << s << "  destination : " << d << "  finish_time : " << nowTime2.count() << endl;
 		// cout << " " << endl;
-
 		allCars[index].goAhead();
 	}
 	makeCorrespondingFile(index);
