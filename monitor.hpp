@@ -14,7 +14,7 @@ private :
     int h;
 public :
     Monitor(int h);
-    void crossCars(int p);
+    double crossCars(int p);
     double calcPolution(int p);
 };
 

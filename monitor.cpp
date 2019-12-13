@@ -4,11 +4,11 @@ Monitor::Monitor(int h){
     this -> h = h;
     sem_init(&(this->mutex), 0, 1);
 }
-void Monitor::crossCars(int p){
+double Monitor::crossCars(int p){
     sem_wait(&mutex);
-    // cout << "I'm here in thread" << endl;
-    calcPolution(p);
+    double emission = calcPolution(p);
     sem_post(&mutex);
+    return emission;
 }
 double Monitor::calcPolution(int p) {
     double ans;

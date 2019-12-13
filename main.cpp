@@ -10,7 +10,7 @@ vector <Path> allpaths;
 vector <Car> allCars;
 int globalPathId = 0;
 int globalCarId = 0;
-
+double totalEmission = 0.0;
 
 Edge findEdge(string s, string d){
 	Edge wantedEdge;
@@ -92,7 +92,7 @@ void getInputs() {
 	    		allpaths[allpaths.size()-1].pathId = globalPathId;
 	    		globalPathId++;
 				for (int i = 0; i < numberOfCars; i++){
-					Car newCar = Car(allpaths[allpaths.size()-1], globalCarId);
+					Car newCar = Car(allpaths[allpaths.size()-1], globalCarId, allpaths.size()-1);
 					allCars.push_back(newCar);
 					globalCarId++;
 				}
@@ -125,30 +125,48 @@ void printStuff(){
 		allCars[i].printInfo();
 	}
 }
+string contentOfCarMoves(int index) {
+	return "hello" + to_string(index);
+}
+void makeCorrespondingFile(int index){
+	int pathId = allCars[index].getPathId();
+	string route = to_string(pathId) + "-" + to_string(index);
+	string content = contentOfCarMoves(index);
+	int fd = open(route.c_str(), O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+	close(fd);
+	fd = open(route.c_str(), O_WRONLY);
+    int writed = write(fd,content.c_str(),content.size());
+    close(fd);
+}
 void threadFunction(int index, int p){
-	string s = allCars[index].getSource();
-	string d = allCars[index].getDestination();
-	// if (allCars[id].)
 	while(true){
-		s = allCars[index].getSource();
-		d = allCars[index].getDestination();
+		string s = allCars[index].getSource();
+		string d = allCars[index].getDestination();
 		int id = findEdgeIndex(s, d);
-		cout << s << " *** " << d << endl;
 		if (id != -1){
-			monitors[id].crossCars(p);
-		}
-		else{
-			cout << "end of car!" << endl;
-			break;
-		}
-		int go = allCars[index].goAhead();
-		// if (go == -1) {
-		// 	cout << "end of car!" << endl;
-		// 	break;
-		// }
+			milliseconds enterTime = duration_cast < milliseconds > (
+				system_clock::now().time_since_epoch()
+			);
+			allCars[index].addEnterTime(enterTime);
 
-		// cout << "path length : " << allCars[index].getPathlength() << "car id : " << index << "  , position : " << allCars[index].getPosition() << endl;
+			double newEmission = monitors[id].crossCars(p);
+
+			allCars[index].setNewEmission(newEmission);
+
+			milliseconds finishTime = duration_cast < milliseconds > (
+				system_clock::now().time_since_epoch()
+			);
+			allCars[index].addFinishTime(finishTime);
+		}
+		else
+			break;
+		// cout << " " << endl;
+		// cout << "car index : " << index << "  source : " << s << "  destination : " << d << "  finish_time : " << nowTime2.count() << endl;
+		// cout << " " << endl;
+
+		allCars[index].goAhead();
 	}
+	makeCorrespondingFile(index);
 }
 
 void makeMonitorsAndThreadsAndDoProcess(){
@@ -168,8 +186,22 @@ void makeMonitorsAndThreadsAndDoProcess(){
 		allThreads[i].join();
 
 }
+void printResults(){
+	int carsSize = allCars.size();
+	for(int i = 0; i < carsSize; i++) {
+		cout << "car id : " << i << endl;
+		cout << "  position : " << allCars[i].getPosition() << endl;
+		cout << "  current emission : " << allCars[i].getCurrentEmission() << endl;
+		cout << "  emissions : " << endl;
+		allCars[i].printEmissions();
+		cout << "  times : " << endl;
+		allCars[i].printTimes();
+		cout << endl << endl << endl;
+	}
+}
 int main() {
 	getInputs();
 	// printStuff(allEdges, allpaths, allCars);
 	makeMonitorsAndThreadsAndDoProcess();
+	// printResults();
 }
