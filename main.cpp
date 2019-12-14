@@ -142,7 +142,7 @@ string contentOfCarMoves(int index, int pathId) {
 	vector <milliseconds> finishTimes = allCars[index].getFinishTimes();
 	double totalEmission = calculateTotalEmission();
 	for (int i = 0; i < iterSize; i++){
-		content += allpaths[pathId].edges[i].source + seperator + to_string(enterTimes[i].count()) + seperator + allpaths[pathId].edges[i].destination + seperator + to_string(finishTimes[i].count()) + seperator + to_string(emissions[i]) + seperator + to_string(totalEmissions[i]) + "\n";
+		content += allpaths[pathId].edges[i].source + seperator + to_string(enterTimes[i].count()) + seperator + allpaths[pathId].edges[i].destination + seperator + to_string(finishTimes[i].count()) + seperator + to_string((int)emissions[i]) + seperator + to_string((int)totalEmissions[i]) + "\n";
 	}
 	return content;
 }
